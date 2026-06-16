@@ -20,3 +20,19 @@ The implementation follows the research-paper modules: user module, data acquisi
 - SQLite default database for easy deployment
 - Docker, Gunicorn and Render-style deployment files included
 
+## Demo Credentials
+
+Admin:
+
+```text
+Email: admin@agropest.local
+Password: Admin@123
+```
+
+Optional seeded farmer after running `python scripts/seed.py`:
+
+```text
+Email: farmer@example.com
+Password: Farmer@123
+```
+
