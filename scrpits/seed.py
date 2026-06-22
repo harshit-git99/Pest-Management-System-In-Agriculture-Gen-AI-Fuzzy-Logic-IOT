@@ -14,3 +14,11 @@ CREATE TABLE IF NOT EXISTS detections (id INTEGER PRIMARY KEY AUTOINCREMENT,user
 CREATE TABLE IF NOT EXISTS feedback (id INTEGER PRIMARY KEY AUTOINCREMENT,detection_id INTEGER NOT NULL,user_id INTEGER NOT NULL,rating INTEGER NOT NULL,outcome TEXT NOT NULL,comment TEXT,created_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS sensor_logs (id INTEGER PRIMARY KEY AUTOINCREMENT,user_id INTEGER NOT NULL,field_name TEXT NOT NULL,temperature REAL NOT NULL,humidity REAL NOT NULL,soil_moisture REAL NOT NULL,pest_count INTEGER NOT NULL,created_at TEXT NOT NULL);
 ''')
+users=[('System Admin','admin@agropest.local','Admin@123','admin','AgroPest Control','HQ'),('Ramesh Patel','farmer@example.com','Farmer@123','farmer','Patel Farms','Vadodara')]
+for name,email,pw,role,farm,loc in users:
+    cur.execute('INSERT OR IGNORE INTO users(name,email,password_hash,role,farm_name,location,created_at) VALUES (?,?,?,?,?,?,?)',(name,email,generate_password_hash(pw),role,farm,loc,datetime.utcnow().isoformat()))
+cur.execute('SELECT id FROM users WHERE email=?',('farmer@example.com',));uid=cur.fetchone()[0]
+adv={'recommendations':['Use yellow sticky traps','Spot spray affected region','Monitor after 48 hours']}
+for i,(pest,crop,risk,score,sev) in enumerate([('Whitefly','Cotton','Moderate',61,58),('Leaf Miner','Tomato','Severe',82,76),('Aphids','Chilli','Low',32,25)]):
+    cur.execute('''INSERT INTO detections(user_id,crop_type,field_name,image_path,pest,confidence,severity,temperature,humidity,risk,risk_score,advice_json,notes,status,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',(uid,crop,f'Field {chr(65+i)}',None,pest,.86,sev,30+i,65+i*5,risk,score,json.dumps(adv),'Seed sample','Open',(datetime.utcnow()-timedelta(days=i)).isoformat()))
+conn.commit();conn.close();print('Seeded database:',DB)
